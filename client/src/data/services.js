@@ -1,50 +1,38 @@
 export const services = [
   {
     id: 1,
-    title: 'Wedding Photography',
-    icon: 'Heart',
-    description: 'Capturing the raw emotions, rituals, and grandeur of your wedding day with a modern and artistic storytelling approach.'
+    title: 'Complete Wedding Planning',
+    image: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=800',
+    description: 'From the first meeting to the final farewell, we handle every detail – décor, logistics, vendors, and coordination – creating a seamless celebration that reflects your vision and style.'
   },
   {
     id: 2,
-    title: 'Pre-Wedding Shoot',
-    icon: 'Camera',
-    description: 'Beautiful, stylized pre-wedding couple shoots at scenic outdoor locations or stylized studio sets that celebrate your romance.'
+    title: 'Theme & Décor Styling',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
+    description: 'We design breathtaking themes and décor setups – blending creativity, color, and elegance to craft a one-of-a-kind atmosphere that matches your dream wedding aesthetic.'
   },
   {
     id: 3,
-    title: 'Cinematic Videography',
-    icon: 'Video',
-    description: 'High-definition, documentary-style cinematic films that weave together emotional highlights and music matching your theme.'
+    title: 'Venue Selection & Management',
+    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
+    description: 'Our experts help you choose the perfect venue – from luxury hotels to heritage palaces – and manage all arrangements to ensure your event runs smoothly.'
   },
   {
     id: 4,
-    title: 'Drone Shoot',
-    icon: 'Plane',
-    description: 'Breathtaking 4K aerial shots and sweeping landscape views of your venue to give your event coverage a larger-than-life scale.'
+    title: 'Guest Relations & RSVP',
+    image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+    description: 'We manage your guest list, send out elegant invitations, track RSVPs, and coordinate travel and accommodation, ensuring your guests feel welcomed and comfortable.'
   },
   {
     id: 5,
-    title: 'Traditional Photography',
-    icon: 'Image',
-    description: 'Comprehensive, classic photography covering all guests, family portraits, and key customs with crisp clarity.'
+    title: 'Bridal Styling & Consultations',
+    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=800',
+    description: 'Our fashion experts guide you in selecting the perfect wedding attire, matching jewelry, and accessories, coordinating with couturiers to ensure you look stunning.'
   },
   {
     id: 6,
-    title: 'Album Design',
-    icon: 'BookOpen',
-    description: 'Custom-designed premium photo albums featuring fine-art printing, bespoke layouts, and luxurious leather or velvet bindings.'
-  },
-  {
-    id: 7,
-    title: 'Photo Editing & Retouching',
-    icon: 'Sliders',
-    description: 'Professional high-end skin retouching, color correction, and mood grading that aligns every photograph to magazine standards.'
-  },
-  {
-    id: 8,
-    title: 'Live Streaming',
-    icon: 'Tv',
-    description: 'Broadcast your events and wedding ceremonies in real-time in high quality, allowing loved ones across the globe to participate.'
+    title: 'Photography & Cinematography',
+    image: 'https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?auto=format&fit=crop&q=80&w=800',
+    description: 'We capture every raw emotion, candid smile, and grand ritual with state-of-the-art gear, delivering cinematic films and heirloom albums that tell your story.'
   }
 ];

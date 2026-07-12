@@ -1,17 +1,5 @@
 import { motion } from 'framer-motion';
 import { services } from '../../data/services';
-import { Heart, Camera, Video, Plane, Image, BookOpen, Sliders, Tv } from 'lucide-react';
-
-const iconsMap = {
-  Heart,
-  Camera,
-  Video,
-  Plane,
-  Image,
-  BookOpen,
-  Sliders,
-  Tv
-};
 
 export default function Services() {
   const containerVariants = {
@@ -19,20 +7,20 @@ export default function Services() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08
+        staggerChildren: 0.1
       }
     }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }
   };
 
   return (
     <section id="services" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
           <span className="text-accent uppercase tracking-[0.2em] text-xs font-semibold block mb-3">
             Our Expertise
           </span>
@@ -47,27 +35,32 @@ export default function Services() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-16 lg:gap-y-24"
         >
           {services.map((service) => {
-            const Icon = iconsMap[service.icon] || Camera;
             return (
               <motion.div
                 key={service.id}
                 variants={cardVariants}
-                whileHover={{ y: -8, scale: 1.02, boxShadow: '0 12px 20px -8px rgba(200, 155, 60, 0.15)' }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="bg-secondary border border-border-light p-8 group hover:bg-white hover:border-accent flex flex-col items-start min-h-[280px] transition-colors duration-300"
+                className="flex flex-col group"
               >
-                <div className="w-12 h-12 bg-white group-hover:bg-accent/10 border border-border-light group-hover:border-accent/20 rounded-full flex items-center justify-center text-accent transition-all duration-300 mb-6 shadow-xs">
-                  <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                {/* Image Container with Hover Zoom */}
+                <div className="w-full aspect-[4/5] overflow-hidden shadow-sm">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
                 </div>
-                <h3 className="font-display text-xl font-light text-dark tracking-wide mb-3 group-hover:text-accent transition-colors duration-300">
-                  {service.title}
-                </h3>
-                <p className="text-dark/60 text-xs font-light leading-relaxed">
-                  {service.description}
-                </p>
+                {/* Overlapping Content Card */}
+                <div className="relative -mt-16 mx-auto w-[88%] bg-white p-6 md:p-8 shadow-md border border-border-light text-center flex flex-col items-center justify-center min-h-[180px] z-10 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+                  <h3 className="font-display text-lg md:text-xl font-normal text-accent tracking-wide mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-dark/70 text-xs md:text-sm font-light leading-relaxed">
+                    {service.description}
+                  </p>
+                </div>
               </motion.div>
             );
           })}
@@ -76,3 +69,4 @@ export default function Services() {
     </section>
   );
 }
+

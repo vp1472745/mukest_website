@@ -6,10 +6,8 @@ export const categories = [
   { id: 'birthday', name: 'Birthdays' },
   { id: 'maternity', name: 'Maternity' },
   { id: 'baby-shoot', name: 'Baby Shoots' },
-  { id: 'fashion', name: 'Fashion' },
-  { id: 'commercial', name: 'Commercial' },
-  { id: 'corporate', name: 'Corporate' },
-  { id: 'events', name: 'Events' },
-  { id: 'travel', name: 'Travel' },
-  { id: 'cinematic', name: 'Cinematic Videos' }
+ 
+
+
+  
 ];
