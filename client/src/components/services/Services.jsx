@@ -1,7 +1,26 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { services } from '../../data/services';
+import { api } from '../../services/api';
 
 export default function Services() {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await api.section.getAll('service');
+        const activeServices = (res.data.data || []).filter(s => s.active);
+        setServices(activeServices);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -16,6 +35,8 @@ export default function Services() {
     hidden: { opacity: 0, y: 40 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }
   };
+
+  if (loading || services.length === 0) return null;
 
   return (
     <section id="services" className="py-20 md:py-28 bg-white">
@@ -40,14 +61,14 @@ export default function Services() {
           {services.map((service) => {
             return (
               <motion.div
-                key={service.id}
+                key={service._id}
                 variants={cardVariants}
                 className="flex flex-col group"
               >
                 {/* Image Container with Hover Zoom */}
                 <div className="w-full aspect-[4/5] overflow-hidden shadow-sm">
                   <img
-                    src={service.image}
+                    src={service.imageUrl}
                     alt={service.title}
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
@@ -58,7 +79,7 @@ export default function Services() {
                     {service.title}
                   </h3>
                   <p className="text-dark/70 text-xs md:text-sm font-light leading-relaxed">
-                    {service.description}
+                    {service.paragraph}
                   </p>
                 </div>
               </motion.div>

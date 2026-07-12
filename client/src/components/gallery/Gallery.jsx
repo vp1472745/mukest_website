@@ -1,12 +1,37 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { categories } from '../../data/categories';
-import { galleryItems } from '../../data/gallery';
+import { api } from '../../services/api';
 import { X, MapPin, Calendar, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 
 export default function Gallery({ selectedCategory, setSelectedCategory }) {
-  const [filteredItems, setFilteredItems] = useState(galleryItems);
+  const [categories, setCategories] = useState([]);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [modalIndex, setModalIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [catsRes, galRes] = await Promise.all([
+          api.section.getAll('category'),
+          api.section.getAll('gallery')
+        ]);
+        
+        const activeCats = (catsRes.data.data || []).filter(c => c.active);
+        const activeGal = (galRes.data.data || []).filter(g => g.active);
+
+        setCategories(activeCats);
+        setGalleryItems(activeGal);
+        setFilteredItems(activeGal);
+      } catch (err) {
+        console.error('Error fetching gallery data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (selectedCategory === 'all') {
@@ -14,10 +39,10 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
     } else {
       setFilteredItems(galleryItems.filter(item => item.category === selectedCategory));
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, galleryItems]);
 
   const openModal = (id) => {
-    const idx = galleryItems.findIndex(item => item.id === id);
+    const idx = galleryItems.findIndex(item => item._id === id);
     setModalIndex(idx);
   };
 
@@ -39,7 +64,6 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
     }
   };
 
-  // Keyboard navigation for modal
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (modalIndex === null) return;
@@ -52,6 +76,8 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
   }, [modalIndex]);
 
   const activeModalItem = modalIndex !== null ? galleryItems[modalIndex] : null;
+
+  if (loading) return null;
 
   return (
     <section id="gallery" className="py-20 md:py-28 bg-white">
@@ -69,17 +95,27 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
 
         {/* Categories Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-border-light pb-6">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 text-xs uppercase tracking-widest transition-all duration-300 font-semibold cursor-pointer ${
+              selectedCategory === 'all'
+                ? 'text-accent border-b-2 border-accent pb-2'
+                : 'text-dark/60 hover:text-accent'
+            }`}
+          >
+            All Work
+          </button>
           {categories.map((cat) => (
             <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              key={cat._id}
+              onClick={() => setSelectedCategory(cat.title)}
               className={`px-4 py-2 text-xs uppercase tracking-widest transition-all duration-300 font-semibold cursor-pointer ${
-                selectedCategory === cat.id
+                selectedCategory === cat.title
                   ? 'text-accent border-b-2 border-accent pb-2'
                   : 'text-dark/60 hover:text-accent'
               }`}
             >
-              {cat.name}
+              {cat.title}
             </button>
           ))}
         </div>
@@ -92,18 +128,18 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item) => (
               <motion.div
-                key={item.id}
+                key={item._id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
                 className="relative overflow-hidden bg-secondary aspect-[4/3] group cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
-                onClick={() => openModal(item.id)}
+                onClick={() => openModal(item._id)}
               >
                 {/* Photo */}
                 <img
-                  src={item.url}
+                  src={item.imageUrl}
                   alt={item.title}
                   loading="lazy"
                   className="w-full h-full object-cover gallery-img-zoom"
@@ -113,7 +149,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 z-10">
                   <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
                     <span className="text-accent uppercase tracking-widest text-[10px] font-semibold mb-1 block">
-                      {categories.find(c => c.id === item.category)?.name}
+                      {item.category}
                     </span>
                     <h3 className="text-white font-display text-lg font-light tracking-wide mb-1">
                       {item.title}
@@ -176,7 +212,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <img
-                    src={activeModalItem.url}
+                    src={activeModalItem.imageUrl}
                     alt={activeModalItem.title}
                     className="max-w-full max-h-[70vh] object-contain hover:scale-102 transition-transform duration-700"
                   />
@@ -205,13 +241,13 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                 >
                   <div>
                     <span className="text-accent uppercase tracking-widest text-xs font-semibold block mb-2">
-                      {categories.find(c => c.id === activeModalItem.category)?.name}
+                      {activeModalItem.category}
                     </span>
                     <h3 className="font-display text-2xl font-light tracking-wide mb-4">
                       {activeModalItem.title}
                     </h3>
                     <p className="text-white/60 text-sm font-light leading-relaxed mb-6">
-                      {activeModalItem.description}
+                      {activeModalItem.paragraph || activeModalItem.description}
                     </p>
                   </div>
 

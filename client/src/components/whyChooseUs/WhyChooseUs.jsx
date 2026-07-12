@@ -1,46 +1,36 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { api } from '../../services/api';
 import { Users, Camera, Zap, Sliders, BookOpen, Heart } from 'lucide-react';
 
-const reasons = [
-  {
-    id: 1,
-    title: 'Professional Team',
-    icon: Users,
-    description: 'A crew of internationally acclaimed photographers and videographers with sharp technical skills and warm attitudes.'
-  },
-  {
-    id: 2,
-    title: 'High Resolution Photos',
-    icon: Camera,
-    description: 'We use state-of-the-art camera systems and high-end lenses to deliver pin-sharp images suitable for massive print sizing.'
-  },
-  {
-    id: 3,
-    title: 'Fast Delivery',
-    icon: Zap,
-    description: 'Enjoy a professional sneak peek of your event within 48 hours, followed by full delivery of final edits in under 3 weeks.'
-  },
-  {
-    id: 4,
-    title: 'Creative Editing',
-    icon: Sliders,
-    description: 'Bespoke custom color grading, mood alignment, and fine-art skin retouching tailored uniquely to each project’s feel.'
-  },
-  {
-    id: 5,
-    title: 'Premium Albums',
-    icon: BookOpen,
-    description: 'We curate and design gorgeous, heavyweight flush-mount albums wrapped in handpicked silk, velvet, or Italian leather.'
-  },
-  {
-    id: 6,
-    title: 'Affordable Packages',
-    icon: Heart,
-    description: 'Premium service structured into clear, transparent, and custom-tailored package levels with absolutely zero hidden fees.'
-  }
-];
+const iconsMap = {
+  Users,
+  Camera,
+  Zap,
+  Sliders,
+  BookOpen,
+  Heart
+};
 
 export default function WhyChooseUs() {
+  const [reasons, setReasons] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStandards = async () => {
+      try {
+        const res = await api.section.getAll('standard');
+        const activeStandards = (res.data.data || []).filter(s => s.active);
+        setReasons(activeStandards);
+      } catch (err) {
+        console.error('Error fetching standards:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStandards();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -55,6 +45,8 @@ export default function WhyChooseUs() {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
+
+  if (loading || reasons.length === 0) return null;
 
   return (
     <section id="why-us" className="py-20 md:py-28 bg-[#ffffff]">
@@ -77,10 +69,10 @@ export default function WhyChooseUs() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {reasons.map((reason) => {
-            const Icon = reason.icon;
+            const Icon = iconsMap[reason.icon] || Heart;
             return (
               <motion.div
-                key={reason.id}
+                key={reason._id}
                 variants={cardVariants}
                 className="bg-[#fcfcfc] border border-border-light p-8 group hover:bg-[#fafafa] hover:border-accent/40 hover:shadow-lg transition-all duration-300 flex gap-6 items-start"
               >

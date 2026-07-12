@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle, Sparkles } from 'lucide-react';
+import { api } from '../../services/api';
 
 export default function Contact() {
+  const [contactInfo, setContactInfo] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +16,18 @@ export default function Contact() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await api.singleSection.get('contact');
+        setContactInfo(res.data.data);
+      } catch (err) {
+        console.error('Error fetching contact info:', err);
+      }
+    };
+    fetchContact();
+  }, []);
 
   const eventTypes = [
     { value: 'wedding', label: 'Wedding Photography' },
@@ -85,8 +99,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-dark/45 block">Phone Inquiry</span>
-                    <a href="tel:+1234567890" className="text-sm text-dark font-medium hover:text-accent transition-colors">
-                      +1 (234) 567-890
+                    <a href={`tel:${contactInfo?.phone}`} className="text-sm text-dark font-medium hover:text-accent transition-colors">
+                      {contactInfo?.phone || '+1 (234) 567-890'}
                     </a>
                   </div>
                 </div>
@@ -97,8 +111,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-dark/45 block">Email Us</span>
-                    <a href="mailto:hello@lenscraftstudio.com" className="text-sm text-dark font-medium hover:text-accent transition-colors">
-                      hello@lenscraftstudio.com
+                    <a href={`mailto:${contactInfo?.email}`} className="text-sm text-dark font-medium hover:text-accent transition-colors">
+                      {contactInfo?.email || 'hello@lenscraftstudio.com'}
                     </a>
                   </div>
                 </div>
@@ -110,7 +124,7 @@ export default function Contact() {
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-dark/45 block">Studio Address</span>
                     <address className="text-sm text-dark font-medium not-italic">
-                      102, Gold Coast Avenue, Sector 5,<br />Gurugram, Haryana - 122001
+                      {contactInfo?.address || '102, Gold Coast Avenue, Sector 5, Gurugram, Haryana - 122001'}
                     </address>
                   </div>
                 </div>

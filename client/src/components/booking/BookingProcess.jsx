@@ -1,14 +1,36 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { bookingSteps } from '../../data/booking';
+import { api } from '../../services/api';
 import { Compass, ClipboardList, Handshake, CalendarCheck } from 'lucide-react';
 
 const iconsMap = {
   FileSearch: ClipboardList,
   Users: Handshake,
-  CalendarCheck: CalendarCheck
+  CalendarCheck: CalendarCheck,
+  ClipboardList
 };
 
 export default function BookingProcess() {
+  const [steps, setSteps] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSteps = async () => {
+      try {
+        const res = await api.section.getAll('process');
+        const activeSteps = (res.data.data || [])
+          .filter(s => s.active)
+          .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
+        setSteps(activeSteps);
+      } catch (err) {
+        console.error('Error fetching process steps:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSteps();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -24,13 +46,18 @@ export default function BookingProcess() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }
   };
 
+  if (loading || steps.length === 0) return null;
+
+  // Use the mediaUrl from the first step as the header background, or a default fallback
+  const headerBg = steps[0]?.mediaUrl || "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80&w=1600";
+
   return (
     <section id="process" className="bg-white overflow-hidden">
       {/* Background Calendar Header Section */}
       <div className="relative w-full h-[320px] md:h-[380px] overflow-hidden">
         {/* Background Image */}
         <img
-          src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80&w=1600"
+          src={headerBg}
           alt="Process Background Calendar"
           className="w-full h-full object-cover"
         />
@@ -43,7 +70,7 @@ export default function BookingProcess() {
               <Compass className="w-4.5 h-4.5" />
             </div>
             <span className="font-display text-white text-xl md:text-2xl font-light tracking-wide">
-              Our Process Section
+              Our Booking Process
             </span>
           </div>
           <p className="text-white/80 max-w-xl text-xs md:text-sm font-light leading-relaxed">
@@ -61,13 +88,15 @@ export default function BookingProcess() {
           viewport={{ once: true, margin: '-100px' }}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
         >
-          {bookingSteps.map((step) => {
+          {steps.map((step, index) => {
+            // Check if icon exists in mapping, default to ClipboardList
             const Icon = iconsMap[step.icon] || ClipboardList;
-            const isSpecial = step.id === 2;
+            // The second card gets the highlight color (sage green)
+            const isSpecial = index === 1;
 
             return (
               <motion.div
-                key={step.id}
+                key={step._id}
                 variants={itemVariants}
                 className={`flex flex-col p-8 md:p-10 shadow-md hover:shadow-lg transition-all duration-300 border min-h-[340px] ${
                   isSpecial
@@ -101,7 +130,7 @@ export default function BookingProcess() {
                     isSpecial ? 'text-white/85' : 'text-dark/65'
                   }`}
                 >
-                  {step.description}
+                  {step.paragraph}
                 </p>
               </motion.div>
             );

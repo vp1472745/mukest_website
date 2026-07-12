@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
 import { motion } from 'framer-motion';
+import { api } from '../../services/api';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -8,31 +10,26 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-const slides = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1920',
-    title: 'Capturing Beautiful Moments',
-    subtitle: 'Creating Timeless Memories',
-    tags: 'Wedding • Pre-Wedding • Engagements'
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1920',
-    title: 'Emotions in Every Frame',
-    subtitle: 'Natural Light Storytelling',
-    tags: 'Maternity • Baby Shoots • Portraits'
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1920',
-    title: 'Editorial & Commercial Excellence',
-    subtitle: 'Elevating Modern Brands',
-    tags: 'Fashion • Corporate • Products'
-  }
-];
-
 export default function Hero() {
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const res = await api.section.getAll('hero');
+        // Only show active slides
+        const activeSlides = (res.data.data || []).filter(s => s.active);
+        setSlides(activeSlides);
+      } catch (err) {
+        console.error('Error fetching hero slides:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSlides();
+  }, []);
+
   const handleScrollTo = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -44,6 +41,14 @@ export default function Hero() {
       });
     }
   };
+
+  if (loading || slides.length === 0) {
+    return (
+      <div className="h-screen w-full bg-dark flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <section id="home" className="relative h-screen w-full bg-dark overflow-hidden">
@@ -60,17 +65,32 @@ export default function Hero() {
           dynamicBullets: true,
         }}
         navigation={true}
-        loop={true}
+        loop={slides.length > 1}
         className="h-full w-full"
       >
         {slides.map((slide) => (
-          <SwiperSlide key={slide.id} className="relative h-full w-full">
-            {/* Background Image with Dark Overlay */}
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms] ease-out scale-105 swiper-slide-active:scale-100"
-              style={{ backgroundImage: `url(${slide.image})` }}
-            >
-              <div className="absolute inset-0 bg-black/45" />
+          <SwiperSlide key={slide._id} className="relative h-full w-full">
+            {/* Background Image/Video with Dark Overlay */}
+            <div className="absolute inset-0 transition-transform duration-[8000ms] ease-out scale-105 swiper-slide-active:scale-100">
+              {slide.resourceType === 'video' ? (
+                <video
+                  src={slide.mediaUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="w-full h-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${slide.mediaUrl})` }}
+                />
+              )}
+              <div 
+                className="absolute inset-0 bg-black" 
+                style={{ opacity: slide.backgroundOverlay ?? 0.45 }}
+              />
             </div>
 
             {/* Slide Content */}
@@ -81,7 +101,7 @@ export default function Hero() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-accent uppercase tracking-[0.3em] text-xs md:text-sm font-semibold mb-3"
               >
-                {slide.tags}
+                {slide.paragraph}
               </motion.span>
 
               <motion.h1
@@ -108,18 +128,22 @@ export default function Hero() {
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <button
-                  onClick={() => handleScrollTo('contact')}
-                  className="bg-accent hover:bg-accent-hover text-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest transition-all duration-300 shadow-lg cursor-pointer"
-                >
-                  Book Your Session
-                </button>
-                <button
-                  onClick={() => handleScrollTo('gallery')}
-                  className="border border-white hover:border-accent hover:bg-accent text-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest transition-all duration-300 cursor-pointer"
-                >
-                  Explore Gallery
-                </button>
+                {slide.primaryButtonText && (
+                  <button
+                    onClick={() => handleScrollTo(slide.primaryButtonLink?.replace('#', '') || 'contact')}
+                    className="bg-accent hover:bg-accent-hover text-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest transition-all duration-300 shadow-lg cursor-pointer"
+                  >
+                    {slide.primaryButtonText}
+                  </button>
+                )}
+                {slide.secondaryButtonText && (
+                  <button
+                    onClick={() => handleScrollTo(slide.secondaryButtonLink?.replace('#', '') || 'gallery')}
+                    className="border border-white hover:border-accent hover:bg-accent text-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest transition-all duration-300 cursor-pointer"
+                  >
+                    {slide.secondaryButtonText}
+                  </button>
+                )}
               </motion.div>
             </div>
           </SwiperSlide>
