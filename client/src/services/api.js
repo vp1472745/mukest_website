@@ -231,5 +231,15 @@ export const api = {
         return await axios.put(`${BASE_URL}/${sectionName}`, data, config);
       }
     }
+  },
+  db: {
+    seed: async () => {
+      if (USE_MOCK) {
+        saveMockDB(initialMockData);
+        return { data: { success: true, message: 'Mock database reset successfully' } };
+      } else {
+        return await axios.post(`${BASE_URL}/seed`, {}, getAxiosConfig());
+      }
+    }
   }
 };

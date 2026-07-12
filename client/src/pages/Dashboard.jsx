@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { toast } from 'react-toastify';
 import {
-  Camera, LayoutDashboard, Sliders, Image as ImageIcon, Heart, Users,
+  Camera, LayoutDashboard, Sliders, Database, Image as ImageIcon, Heart, Users,
   ClipboardList, MessageSquare, BookOpen, Mail, Globe, Settings, LogOut,
   Plus, Edit2, Trash2, Check, X, Search, ChevronRight, Eye, ShieldAlert,
   ArrowUpDown, Loader2, Play
@@ -78,6 +78,23 @@ export default function Dashboard() {
     api.auth.logout();
     toast.success('Logged out successfully');
     navigate('/admin/login');
+  };
+
+  const handleSeedDatabase = async () => {
+    if (!window.confirm("Are you sure you want to seed/reset the database? This will clear all changes and restore default records.")) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await api.db.seed();
+      toast.success(res.data.message || 'Database seeded/reset successfully!');
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || err.message || 'Seeding failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchData = async () => {
@@ -332,6 +349,14 @@ export default function Dashboard() {
               {import.meta.env.VITE_API_USE_MOCK === 'true' ? 'ACTIVE' : 'OFFLINE'}
             </span>
           </div>
+          <button
+            onClick={handleSeedDatabase}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 mb-2 bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-400 border border-emerald-900/40 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 cursor-pointer disabled:opacity-50"
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>{loading ? 'Seeding...' : 'Seed Database'}</span>
+          </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-950/40 hover:bg-red-950/80 text-red-400 border border-red-900/40 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 cursor-pointer"

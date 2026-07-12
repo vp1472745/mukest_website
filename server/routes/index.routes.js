@@ -12,6 +12,7 @@ const testimonialRoutes = require('./testimonial.routes');
 const aboutRoutes = require('./about.routes');
 const contactRoutes = require('./contact.routes');
 const seoRoutes = require('./seo.routes');
+const seedRoutes = require('./seed.routes');
 
 router.use('/auth', authRoutes);
 router.use('/hero', heroRoutes);
@@ -24,5 +25,6 @@ router.use('/testimonial', testimonialRoutes);
 router.use('/about', aboutRoutes);
 router.use('/contact', contactRoutes);
 router.use('/seo', seoRoutes);
+router.use('/seed', seedRoutes);
 
 module.exports = router;

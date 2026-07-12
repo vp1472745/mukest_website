@@ -14,8 +14,12 @@ const Seo = require('../models/Seo');
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB Connected for seeding...');
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log('MongoDB Connected for seeding...');
+    } else {
+      console.log('MongoDB already connected for seeding.');
+    }
 
     // Clear existing data
     await User.deleteMany({});
@@ -365,11 +369,20 @@ const seedData = async () => {
     console.log('Seeded SEO details.');
 
     console.log('DB Seeding Completed successfully!');
-    process.exit(0);
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('DB Seeding Error:', error.message);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    }
+    throw error;
   }
 };
 
-seedData();
+if (require.main === module) {
+  seedData();
+}
+
+module.exports = seedData;
