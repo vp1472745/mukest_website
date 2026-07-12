@@ -1,0 +1,14 @@
+{
+  "name": "lenscraft-studio",
+  "version": "1.0.0",
+  "description": "LensCraft Studio - Premium Wedding & Event Planning Monorepo",
+  "scripts": {
+    "install:client": "npm install --prefix client",
+    "install:server": "npm install --prefix server",
+    "install:all": "npm run install:server && npm run install:client",
+    "build:client": "npm run build --prefix client",
+    "start:server": "npm run start --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
+  }
+}

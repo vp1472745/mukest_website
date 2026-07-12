@@ -203,5 +203,48 @@ The endpoints listed below use standard CRUD methods to control database documen
 
 ---
 
+## 🌐 Deployment Instructions
+
+LensCraft Studio is prepared for two common deployment strategies: **Unified Deployment (Single Service)** or **Split Deployment (Separate Hostings)**.
+
+### Option A: Unified Deployment (Recommended)
+This approach hosts both the frontend React app and the backend Express API on a single platform (e.g., Render, Railway, or Heroku). The server will serve the React production bundle automatically.
+
+1. **Deploying to Render**:
+   - Create a new **Web Service** on Render.
+   - Connect your GitHub repository.
+   - Set the following configuration details:
+     * **Environment**: `Node`
+     * **Build Command**: `npm run install:all && npm run build:client`
+     * **Start Command**: `npm run start:server`
+   - Set the required **Environment Variables** in the Render dashboard:
+     * `NODE_ENV`: `production`
+     * `MONGO_URI`: *Your MongoDB connection string*
+     * `JWT_SECRET`: *Your JWT secret*
+     * `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: *Cloudinary credentials*
+     * `CLIENT_URL`: *The URL of your deployed Render service (optional, defaults to allow same-origin)*
+
+### Option B: Split Deployment (Separate Services)
+This approach hosts the frontend on a static hosting platform (like Vercel or Netlify) and the backend server on Render or Railway.
+
+1. **Deploying the Backend (Render / Railway)**:
+   - Create a **Web Service** for the backend server.
+   - **Root Directory**: `server`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - Add all environment variables (except `CLIENT_URL`, which should point to your upcoming frontend URL).
+
+2. **Deploying the Frontend (Vercel)**:
+   - Import your repository to Vercel.
+   - **Root Directory**: `client`
+   - Set the build settings:
+     * **Build Command**: `npm run build` or `vite build`
+     * **Output Directory**: `dist`
+   - Configure **Environment Variables**:
+     * `VITE_API_USE_MOCK`: `false` (Forces API calls instead of localStorage mocks)
+     * `VITE_API_BASE_URL`: `https://your-backend-url.onrender.com/api` (Point to your deployed server)
+
+---
+
 ## 🛡 License
 This project is licensed under the ISC License. All mock assets and media belong to their respective creators under Unsplash usage rules.
