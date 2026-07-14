@@ -1,6 +1,6 @@
-const aboutService = require('../services/about.service');
-const { uploadToCloudinary } = require('../services/upload.service');
-const ApiResponse = require('../common/ApiResponse');
+import aboutService from '../services/about.service.js';
+import { uploadToCloudinary } from '../services/upload.service.js';
+import ApiResponse from '../common/ApiResponse.js';
 
 const get = async (req, res, next) => {
   try {
@@ -35,7 +35,15 @@ const update = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   get,
   update
+
+};
+export default {
+
+  get,
+  update
+
 };

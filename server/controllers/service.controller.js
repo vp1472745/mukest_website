@@ -1,7 +1,7 @@
-const serviceService = require('../services/service.service');
-const { uploadToCloudinary } = require('../services/upload.service');
-const ApiResponse = require('../common/ApiResponse');
-const ApiError = require('../common/ApiError');
+import serviceService from '../services/service.service.js';
+import { uploadToCloudinary } from '../services/upload.service.js';
+import ApiResponse from '../common/ApiResponse.js';
+import ApiError from '../common/ApiError.js';
 
 const getAll = async (req, res, next) => {
   try {
@@ -64,10 +64,21 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

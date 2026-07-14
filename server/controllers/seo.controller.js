@@ -1,6 +1,6 @@
-const seoService = require('../services/seo.service');
-const ApiResponse = require('../common/ApiResponse');
-const ApiError = require('../common/ApiError');
+import seoService from '../services/seo.service.js';
+import ApiResponse from '../common/ApiResponse.js';
+import ApiError from '../common/ApiError.js';
 
 const getByPage = async (req, res, next) => {
   try {
@@ -31,8 +31,17 @@ const getAll = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   getByPage,
   update,
   getAll
+
+};
+export default {
+
+  getByPage,
+  update,
+  getAll
+
 };

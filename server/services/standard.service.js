@@ -1,4 +1,4 @@
-const Standard = require('../models/Standard');
+import Standard from '../models/Standard.js';
 
 const getAll = async (query = {}) => {
   return await Standard.find(query).sort({ displayOrder: 1 });
@@ -20,10 +20,21 @@ const remove = async (id) => {
   return await Standard.findByIdAndDelete(id);
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

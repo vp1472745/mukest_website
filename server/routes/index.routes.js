@@ -1,18 +1,18 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const authRoutes = require('./auth.routes');
-const heroRoutes = require('./hero.routes');
-const categoryRoutes = require('./category.routes');
-const galleryRoutes = require('./gallery.routes');
-const serviceRoutes = require('./service.routes');
-const standardRoutes = require('./standard.routes');
-const processRoutes = require('./process.routes');
-const testimonialRoutes = require('./testimonial.routes');
-const aboutRoutes = require('./about.routes');
-const contactRoutes = require('./contact.routes');
-const seoRoutes = require('./seo.routes');
-const seedRoutes = require('./seed.routes');
+import authRoutes from './auth.routes.js';
+import heroRoutes from './hero.routes.js';
+import categoryRoutes from './category.routes.js';
+import galleryRoutes from './gallery.routes.js';
+import serviceRoutes from './service.routes.js';
+import standardRoutes from './standard.routes.js';
+import processRoutes from './process.routes.js';
+import testimonialRoutes from './testimonial.routes.js';
+import aboutRoutes from './about.routes.js';
+import contactRoutes from './contact.routes.js';
+import seoRoutes from './seo.routes.js';
+import seedRoutes from './seed.routes.js';
 
 router.use('/auth', authRoutes);
 router.use('/hero', heroRoutes);
@@ -27,4 +27,4 @@ router.use('/contact', contactRoutes);
 router.use('/seo', seoRoutes);
 router.use('/seed', seedRoutes);
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const Contact = require('../models/Contact');
+import Contact from '../models/Contact.js';
 
 const get = async () => {
   let contact = await Contact.findOne();
@@ -17,7 +17,15 @@ const update = async (data) => {
   return await Contact.findByIdAndUpdate(contact._id, data, { new: true, runValidators: true });
 };
 
-module.exports = {
+export {
+
   get,
   update
+
+};
+export default {
+
+  get,
+  update
+
 };

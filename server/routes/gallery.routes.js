@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const galleryController = require('../controllers/gallery.controller');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+import galleryController from '../controllers/gallery.controller.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 
 router.get('/', galleryController.getAll);
 router.get('/:id', galleryController.getById);
@@ -11,4 +11,4 @@ router.post('/', verifyJWT, verifyAdmin, upload.array('files', 15), galleryContr
 router.put('/:id', verifyJWT, verifyAdmin, upload.array('files', 15), galleryController.update);
 router.delete('/:id', verifyJWT, verifyAdmin, galleryController.remove);
 
-module.exports = router;
+export default router;

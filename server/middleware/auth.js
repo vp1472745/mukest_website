@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const ApiError = require('../common/ApiError');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import ApiError from '../common/ApiError.js';
+import User from '../models/User.js';
 
-const verifyJWT = async (req, res, next) => {
+export const verifyJWT = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
@@ -22,11 +22,9 @@ const verifyJWT = async (req, res, next) => {
   }
 };
 
-const verifyAdmin = (req, res, next) => {
+export const verifyAdmin = (req, res, next) => {
   if (req.user?.role !== 'Admin') {
     return next(new ApiError(403, 'Access denied. Administrator privileges required.'));
   }
   next();
 };
-
-module.exports = { verifyJWT, verifyAdmin };

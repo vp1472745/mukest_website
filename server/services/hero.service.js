@@ -1,5 +1,5 @@
-const Hero = require('../models/Hero');
-const { deleteFromCloudinary } = require('./upload.service');
+import Hero from '../models/Hero.js';
+import { deleteFromCloudinary } from './upload.service.js';
 
 const getAll = async (query = {}) => {
   return await Hero.find(query).sort({ sliderOrder: 1 });
@@ -27,10 +27,21 @@ const remove = async (id) => {
   return await Hero.findByIdAndDelete(id);
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

@@ -1,5 +1,5 @@
-const About = require('../models/About');
-const { deleteFromCloudinary } = require('./upload.service');
+import About from '../models/About.js';
+import { deleteFromCloudinary } from './upload.service.js';
 
 const get = async () => {
   let about = await About.findOne();
@@ -25,7 +25,15 @@ const update = async (data) => {
   return await About.findByIdAndUpdate(about._id, data, { new: true, runValidators: true });
 };
 
-module.exports = {
+export {
+
   get,
   update
+
+};
+export default {
+
+  get,
+  update
+
 };

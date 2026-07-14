@@ -1,5 +1,5 @@
-const Testimonial = require('../models/Testimonial');
-const { deleteFromCloudinary } = require('./upload.service');
+import Testimonial from '../models/Testimonial.js';
+import { deleteFromCloudinary } from './upload.service.js';
 
 const getAll = async (query = {}) => {
   return await Testimonial.find(query).sort({ displayOrder: 1 });
@@ -26,10 +26,21 @@ const remove = async (id) => {
   return await Testimonial.findByIdAndDelete(id);
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

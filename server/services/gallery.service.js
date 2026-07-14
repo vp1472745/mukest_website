@@ -1,5 +1,5 @@
-const Gallery = require('../models/Gallery');
-const { deleteFromCloudinary } = require('./upload.service');
+import Gallery from '../models/Gallery.js';
+import { deleteFromCloudinary } from './upload.service.js';
 
 const getAll = async (query = {}) => {
   return await Gallery.find(query).sort({ displayOrder: 1 });
@@ -31,10 +31,21 @@ const remove = async (id) => {
   return await Gallery.findByIdAndDelete(id);
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

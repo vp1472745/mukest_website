@@ -1,5 +1,5 @@
-const Category = require('../models/Category');
-const { deleteFromCloudinary } = require('./upload.service');
+import Category from '../models/Category.js';
+import { deleteFromCloudinary } from './upload.service.js';
 
 const getAll = async (query = {}) => {
   return await Category.find(query).sort({ displayOrder: 1 });
@@ -26,10 +26,21 @@ const remove = async (id) => {
   return await Category.findByIdAndDelete(id);
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

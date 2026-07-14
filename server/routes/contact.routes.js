@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const contactController = require('../controllers/contact.controller');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
+import contactController from '../controllers/contact.controller.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
 
 router.get('/', contactController.get);
 router.put('/', verifyJWT, verifyAdmin, contactController.update);
 
-module.exports = router;
+export default router;

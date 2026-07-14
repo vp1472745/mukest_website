@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const authController = require('../controllers/auth.controller');
-const { verifyJWT } = require('../middleware/auth');
+import authController from '../controllers/auth.controller.js';
+import { verifyJWT } from '../middleware/auth.js';
 
 router.post('/login', authController.login);
 router.get('/profile', verifyJWT, authController.getProfile);
 router.put('/profile', verifyJWT, authController.updateProfile);
 
-module.exports = router;
+export default router;

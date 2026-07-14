@@ -1,16 +1,17 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const User = require('../models/User');
-const Hero = require('../models/Hero');
-const Category = require('../models/Category');
-const Gallery = require('../models/Gallery');
-const Service = require('../models/Service');
-const Standard = require('../models/Standard');
-const ProcessModel = require('../models/Process');
-const Testimonial = require('../models/Testimonial');
-const About = require('../models/About');
-const Contact = require('../models/Contact');
-const Seo = require('../models/Seo');
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import User from '../models/User.js';
+import Hero from '../models/Hero.js';
+import Category from '../models/Category.js';
+import Gallery from '../models/Gallery.js';
+import Service from '../models/Service.js';
+import Standard from '../models/Standard.js';
+import ProcessModel from '../models/Process.js';
+import Testimonial from '../models/Testimonial.js';
+import About from '../models/About.js';
+import Contact from '../models/Contact.js';
+import Seo from '../models/Seo.js';
 
 const seedData = async () => {
   try {
@@ -369,20 +370,20 @@ const seedData = async () => {
     console.log('Seeded SEO details.');
 
     console.log('DB Seeding Completed successfully!');
-    if (require.main === module) {
+    if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(0);
     }
   } catch (error) {
     console.error('DB Seeding Error:', error.message);
-    if (require.main === module) {
+    if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     }
     throw error;
   }
 };
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   seedData();
 }
 
-module.exports = seedData;
+export default seedData;

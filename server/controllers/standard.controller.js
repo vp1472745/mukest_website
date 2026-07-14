@@ -1,6 +1,6 @@
-const standardService = require('../services/standard.service');
-const ApiResponse = require('../common/ApiResponse');
-const ApiError = require('../common/ApiError');
+import standardService from '../services/standard.service.js';
+import ApiResponse from '../common/ApiResponse.js';
+import ApiError from '../common/ApiError.js';
 
 const getAll = async (req, res, next) => {
   try {
@@ -49,10 +49,21 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   getAll,
   getById,
   create,
   update,
   remove
+
+};
+export default {
+
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+
 };

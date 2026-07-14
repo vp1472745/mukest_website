@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const seedData = require('../seed/seed.js');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
-const ApiResponse = require('../common/ApiResponse');
+import seedData from '../seed/seed.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
+import ApiResponse from '../common/ApiResponse.js';
 
 router.post('/', verifyJWT, verifyAdmin, async (req, res, next) => {
   try {
@@ -13,4 +13,4 @@ router.post('/', verifyJWT, verifyAdmin, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

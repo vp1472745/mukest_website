@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const serviceController = require('../controllers/service.controller');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+import serviceController from '../controllers/service.controller.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 
 router.get('/', serviceController.getAll);
 router.get('/:id', serviceController.getById);
@@ -11,4 +11,4 @@ router.post('/', verifyJWT, verifyAdmin, upload.single('file'), serviceControlle
 router.put('/:id', verifyJWT, verifyAdmin, upload.single('file'), serviceController.update);
 router.delete('/:id', verifyJWT, verifyAdmin, serviceController.remove);
 
-module.exports = router;
+export default router;

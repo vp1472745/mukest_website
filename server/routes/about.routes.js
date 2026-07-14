@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const aboutController = require('../controllers/about.controller');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+import aboutController from '../controllers/about.controller.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 
 router.get('/', aboutController.get);
 
@@ -17,4 +17,4 @@ router.put(
   aboutController.update
 );
 
-module.exports = router;
+export default router;

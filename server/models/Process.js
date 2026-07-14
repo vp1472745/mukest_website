@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const processSchema = new mongoose.Schema(
   {
@@ -34,4 +34,4 @@ const processSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Process', processSchema);
+export default mongoose.model('Process', processSchema);

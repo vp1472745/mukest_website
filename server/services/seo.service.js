@@ -1,4 +1,4 @@
-const Seo = require('../models/Seo');
+import Seo from '../models/Seo.js';
 
 const getByPage = async (page = 'global') => {
   let seo = await Seo.findOne({ page });
@@ -21,8 +21,17 @@ const getAll = async () => {
   return await Seo.find({});
 };
 
-module.exports = {
+export {
+
   getByPage,
   update,
   getAll
+
+};
+export default {
+
+  getByPage,
+  update,
+  getAll
+
 };

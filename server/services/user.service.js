@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const ApiError = require('../common/ApiError');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+import ApiError from '../common/ApiError.js';
 
 const login = async (email, password) => {
   const user = await User.findOne({ email });
@@ -35,7 +35,15 @@ const updateProfile = async (id, data) => {
   return { _id: user._id, email: user.email, role: user.role };
 };
 
-module.exports = {
+export {
+
   login,
   updateProfile
+
+};
+export default {
+
+  login,
+  updateProfile
+
 };

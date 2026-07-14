@@ -1,5 +1,5 @@
-const userService = require('../services/user.service');
-const ApiResponse = require('../common/ApiResponse');
+import userService from '../services/user.service.js';
+import ApiResponse from '../common/ApiResponse.js';
 
 const login = async (req, res, next) => {
   try {
@@ -28,8 +28,17 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   login,
   updateProfile,
   getProfile
+
+};
+export default {
+
+  login,
+  updateProfile,
+  getProfile
+
 };

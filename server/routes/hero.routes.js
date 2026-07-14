@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const heroController = require('../controllers/hero.controller');
-const { verifyJWT, verifyAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+import heroController from '../controllers/hero.controller.js';
+import { verifyJWT, verifyAdmin } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 
 router.get('/', heroController.getAll);
 router.get('/:id', heroController.getById);
@@ -11,4 +11,4 @@ router.post('/', verifyJWT, verifyAdmin, upload.single('file'), heroController.c
 router.put('/:id', verifyJWT, verifyAdmin, upload.single('file'), heroController.update);
 router.delete('/:id', verifyJWT, verifyAdmin, heroController.remove);
 
-module.exports = router;
+export default router;

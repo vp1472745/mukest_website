@@ -1,5 +1,5 @@
-const contactService = require('../services/contact.service');
-const ApiResponse = require('../common/ApiResponse');
+import contactService from '../services/contact.service.js';
+import ApiResponse from '../common/ApiResponse.js';
 
 const get = async (req, res, next) => {
   try {
@@ -19,7 +19,15 @@ const update = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+
   get,
   update
+
+};
+export default {
+
+  get,
+  update
+
 };

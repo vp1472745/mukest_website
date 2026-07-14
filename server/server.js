@@ -1,10 +1,14 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const connectDB = require('./config/db');
-const routes = require('./routes/index.routes');
-const errorHandler = require('./middleware/errorHandler');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import connectDB from './config/db.js';
+import routes from './routes/index.routes.js';
+import errorHandler from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,7 +17,7 @@ connectDB();
 
 const clientUrl = process.env.CLIENT_URL;
 app.use(cors({
-  origin: clientUrl ? [clientUrl, 'http://localhost:5173', 'http://localhost:3000'] : '*',
+  origin: clientUrl ? [clientUrl, 'http://localhost:5173', 'http://localhost:3000',"https://mukest-website.vercel.app/"] : '*',
   credentials: true
 }));
 
