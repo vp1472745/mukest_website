@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { initialMockData } from './mockData';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://mukest-website.onrender.com/api';
 const USE_MOCK = import.meta.env.VITE_API_USE_MOCK === 'true';
 
 // Helper to initialize local storage mock DB
