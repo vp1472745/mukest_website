@@ -1,14 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import routes from './routes/index.routes.js';
 import errorHandler from './middleware/errorHandler.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,22 +21,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', routes);
 
-// Serve static frontend assets in production (Unified deployment)
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  
-  app.get(/.*/, (req, res) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-    } else {
-      res.status(404).json({ success: false, message: 'API endpoint not found' });
-    }
-  });
-} else {
-  app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to LensCraft Admin API Server' });
-  });
-}
+// Root route
+app.get('/', (req, res) => {
+  res.json({ status: 'online', message: 'Welcome to LensCraft Admin API Server' });
+});
 
 app.use(errorHandler);
 
