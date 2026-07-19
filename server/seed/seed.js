@@ -154,6 +154,16 @@ const seedData = async () => {
         active: true,
         imageUrl: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&q=80&w=800',
         public_id: 'seed_cat_6'
+      },
+      {
+        icon: 'Film',
+        title: 'Film',
+        subtitle: 'Cinematic Stories',
+        description: 'High-definition wedding films and cinematic recaps.',
+        displayOrder: 7,
+        active: true,
+        imageUrl: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=800',
+        public_id: 'seed_cat_7'
       }
     ];
     await Category.insertMany(categories);
@@ -202,6 +212,36 @@ const seedData = async () => {
         featured: false,
         active: true,
         displayOrder: 3
+      },
+      {
+        imageUrl: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=1200',
+        public_id: 'seed_gal_4',
+        images: [{ secure_url: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=1200', public_id: 'seed_gal_4' }],
+        category: 'Film',
+        title: 'A Royal Love Story',
+        subtitle: 'Cinematic Jodhpur Recap',
+        paragraph: 'A premium cinematic wedding film capturing the grand scale and emotional promises of Rohini and Vivek.',
+        date: 'Jan 15, 2026',
+        location: 'Umaid Bhawan Palace, Jodhpur',
+        videoUrl: 'https://www.youtube.com/embed/YdVEuM6dE9M',
+        featured: true,
+        active: true,
+        displayOrder: 4
+      },
+      {
+        imageUrl: 'https://images.unsplash.com/photo-1481162854517-d9e353af153d?auto=format&fit=crop&q=80&w=1200',
+        public_id: 'seed_gal_5',
+        images: [{ secure_url: 'https://images.unsplash.com/photo-1481162854517-d9e353af153d?auto=format&fit=crop&q=80&w=1200', public_id: 'seed_gal_5' }],
+        category: 'Film',
+        title: 'Sunset Whispers',
+        subtitle: 'Pre-Wedding Film',
+        paragraph: 'A dreamy cinematic couple shoot capturing sunset playfulness, natural glances, and romance in the sand dunes.',
+        date: 'Feb 12, 2026',
+        location: 'Sam Sand Dunes, Jaisalmer',
+        videoUrl: 'https://www.youtube.com/embed/YdVEuM6dE9M',
+        featured: false,
+        active: true,
+        displayOrder: 5
       }
     ];
     await Gallery.insertMany(galleries);

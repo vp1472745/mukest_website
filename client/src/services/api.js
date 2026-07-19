@@ -6,12 +6,34 @@ const USE_MOCK = import.meta.env.VITE_API_USE_MOCK === 'true';
 
 // Helper to initialize local storage mock DB
 const getMockDB = () => {
-  const db = localStorage.getItem('lenscraft_mock_db');
-  if (!db) {
+  const dbStr = localStorage.getItem('lenscraft_mock_db');
+  if (!dbStr) {
     localStorage.setItem('lenscraft_mock_db', JSON.stringify(initialMockData));
     return initialMockData;
   }
-  return JSON.parse(db);
+  try {
+    const db = JSON.parse(dbStr);
+    const hasFilmCat = db.category && db.category.some(cat => cat.title === 'Film');
+    if (!hasFilmCat && initialMockData.category.some(cat => cat.title === 'Film')) {
+      const filmCat = initialMockData.category.find(cat => cat.title === 'Film');
+      if (filmCat && db.category) {
+        db.category.push(filmCat);
+      }
+      const filmItems = initialMockData.gallery.filter(item => item.category === 'Film');
+      if (db.gallery) {
+        filmItems.forEach(item => {
+          if (!db.gallery.some(g => g._id === item._id)) {
+            db.gallery.push(item);
+          }
+        });
+      }
+      localStorage.setItem('lenscraft_mock_db', JSON.stringify(db));
+    }
+    return db;
+  } catch (e) {
+    localStorage.setItem('lenscraft_mock_db', JSON.stringify(initialMockData));
+    return initialMockData;
+  }
 };
 
 const saveMockDB = (data) => {
@@ -28,13 +50,13 @@ const getAxiosConfig = () => {
   };
 };
 
-// Mock file-to-base64 reader helper
+// Mock file reader helper - uses URL.createObjectURL to bypass localStorage quota limits
 const readFileAsDataURL = (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.readAsDataURL(file);
-  });
+  try {
+    return Promise.resolve(URL.createObjectURL(file));
+  } catch (err) {
+    return Promise.resolve('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800');
+  }
 };
 
 export const api = {
@@ -104,32 +126,94 @@ export const api = {
     create: async (sectionName, data, isMultipart = false) => {
       if (USE_MOCK) {
         const db = getMockDB();
-        const newItem = { _id: `mock_${sectionName}_${Date.now()}`, active: true };
+        db[sectionName] = db[sectionName] || [];
 
         if (isMultipart) {
-          // Parse FormData keys into object
-          const entries = Array.from(data.entries());
-          for (const [key, val] of entries) {
-            if (val instanceof File) {
-              newItem[key === 'file' ? 'mediaUrl' : 'imageUrl'] = await readFileAsDataURL(val);
-              newItem.public_id = `mock_pub_${Date.now()}`;
+          const files = data.getAll('files').length > 0 ? data.getAll('files') : data.getAll('file');
+          
+          if (sectionName === 'gallery') {
+            const newItem = { _id: `mock_gallery_${Date.now()}`, active: true, images: [] };
+            for (const file of files) {
+              const base64Url = await readFileAsDataURL(file);
+              newItem.images.push({
+                secure_url: base64Url,
+                public_id: `mock_pub_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+              });
+            }
+            if (newItem.images.length > 0) {
+              newItem.imageUrl = newItem.images[0].secure_url;
+              newItem.public_id = newItem.images[0].public_id;
+            }
+            
+            // Assign other fields
+            const entries = Array.from(data.entries());
+            for (const [key, val] of entries) {
+              if (!(val instanceof File)) {
+                newItem[key] = val;
+              }
+            }
+            
+            if (newItem.displayOrder) newItem.displayOrder = Number(newItem.displayOrder);
+            db[sectionName].push(newItem);
+            saveMockDB(db);
+            return { data: { success: true, data: newItem } };
+          } else {
+            // Bulk create for other sections if multiple files are uploaded
+            const baseFields = { active: true };
+            const entries = Array.from(data.entries());
+            for (const [key, val] of entries) {
+              if (!(val instanceof File)) {
+                baseFields[key] = val;
+              }
+            }
+
+            const createdItems = [];
+            if (files.length > 0) {
+              for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const base64Url = await readFileAsDataURL(file);
+                const newItem = {
+                  ...baseFields,
+                  _id: `mock_${sectionName}_${Date.now()}_${i}`,
+                  public_id: `mock_pub_${Date.now()}_${i}`
+                };
+                newItem[sectionName === 'hero' || sectionName === 'process' ? 'mediaUrl' : 'imageUrl'] = base64Url;
+                
+                if (sectionName === 'hero') {
+                  newItem.resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+                }
+                
+                // Adjust order numbers
+                if (newItem.sliderOrder) newItem.sliderOrder = Number(newItem.sliderOrder) + i;
+                if (newItem.displayOrder) newItem.displayOrder = Number(newItem.displayOrder) + i;
+                if (newItem.stepNumber) newItem.stepNumber = Number(newItem.stepNumber) + i;
+
+                db[sectionName].push(newItem);
+                createdItems.push(newItem);
+              }
+              saveMockDB(db);
+              return { data: { success: true, data: createdItems.length === 1 ? createdItems[0] : createdItems } };
             } else {
-              newItem[key] = val;
+              // No files, just create with base fields
+              const newItem = {
+                ...baseFields,
+                _id: `mock_${sectionName}_${Date.now()}`
+              };
+              db[sectionName].push(newItem);
+              saveMockDB(db);
+              return { data: { success: true, data: newItem } };
             }
           }
         } else {
+          const newItem = { _id: `mock_${sectionName}_${Date.now()}`, active: true };
           Object.assign(newItem, data);
+          if (newItem.sliderOrder) newItem.sliderOrder = Number(newItem.sliderOrder);
+          if (newItem.displayOrder) newItem.displayOrder = Number(newItem.displayOrder);
+          if (newItem.stepNumber) newItem.stepNumber = Number(newItem.stepNumber);
+          db[sectionName].push(newItem);
+          saveMockDB(db);
+          return { data: { success: true, data: newItem } };
         }
-
-        // Adjust displayOrder/sliderOrder or values to numbers
-        if (newItem.sliderOrder) newItem.sliderOrder = Number(newItem.sliderOrder);
-        if (newItem.displayOrder) newItem.displayOrder = Number(newItem.displayOrder);
-        if (newItem.stepNumber) newItem.stepNumber = Number(newItem.stepNumber);
-
-        db[sectionName] = db[sectionName] || [];
-        db[sectionName].push(newItem);
-        saveMockDB(db);
-        return { data: { success: true, data: newItem } };
       } else {
         const config = getAxiosConfig();
         if (isMultipart) {
@@ -149,13 +233,46 @@ export const api = {
         const updatedItem = { ...db[sectionName][index] };
 
         if (isMultipart) {
-          const entries = Array.from(data.entries());
-          for (const [key, val] of entries) {
-            if (val instanceof File) {
-              updatedItem[key === 'file' ? 'mediaUrl' : 'imageUrl'] = await readFileAsDataURL(val);
+          const files = data.getAll('files').length > 0 ? data.getAll('files') : data.getAll('file');
+          
+          if (sectionName === 'gallery') {
+            if (files.length > 0) {
+              const newImages = [];
+              for (const file of files) {
+                const base64Url = await readFileAsDataURL(file);
+                newImages.push({
+                  secure_url: base64Url,
+                  public_id: `mock_pub_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+                });
+              }
+              updatedItem.images = newImages;
+              updatedItem.imageUrl = newImages[0].secure_url;
+              updatedItem.public_id = newImages[0].public_id;
+            }
+            
+            // Assign other fields
+            const entries = Array.from(data.entries());
+            for (const [key, val] of entries) {
+              if (!(val instanceof File)) {
+                updatedItem[key] = val;
+              }
+            }
+          } else {
+            if (files.length > 0) {
+              const base64Url = await readFileAsDataURL(files[0]);
+              updatedItem[sectionName === 'hero' || sectionName === 'process' ? 'mediaUrl' : 'imageUrl'] = base64Url;
               updatedItem.public_id = `mock_pub_${Date.now()}`;
-            } else {
-              updatedItem[key] = val;
+              if (sectionName === 'hero') {
+                updatedItem.resourceType = files[0].type.startsWith('video/') ? 'video' : 'image';
+              }
+            }
+            
+            // Assign other fields
+            const entries = Array.from(data.entries());
+            for (const [key, val] of entries) {
+              if (!(val instanceof File)) {
+                updatedItem[key] = val;
+              }
             }
           }
         } else {

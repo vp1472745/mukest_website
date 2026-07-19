@@ -7,8 +7,8 @@ import upload from '../middleware/upload.js';
 router.get('/', galleryController.getAll);
 router.get('/:id', galleryController.getById);
 
-router.post('/', verifyJWT, verifyAdmin, upload.array('files', 15), galleryController.create);
-router.put('/:id', verifyJWT, verifyAdmin, upload.array('files', 15), galleryController.update);
+router.post('/', verifyJWT, verifyAdmin, upload.any(), galleryController.create);
+router.put('/:id', verifyJWT, verifyAdmin, upload.any(), galleryController.update);
 router.delete('/:id', verifyJWT, verifyAdmin, galleryController.remove);
 
 export default router;

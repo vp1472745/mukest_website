@@ -11,6 +11,7 @@ const gallerySchema = new mongoose.Schema(
     // Primary fallback image for simpler integrations
     imageUrl: String,
     public_id: String,
+    videoUrl: String,
     category: {
       type: String, // String category ID or name matching Categories
       required: true

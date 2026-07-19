@@ -25,18 +25,27 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const payload = { ...req.body };
+    const files = req.files || (req.file ? [req.file] : []);
     
-    if (req.file) {
-      const resourceType = req.body.resourceType || 'image';
-      const result = await uploadToCloudinary(req.file.buffer, resourceType);
-      payload.mediaUrl = result.secure_url;
-      payload.public_id = result.public_id;
+    if (files.length > 0) {
+      const createdItems = [];
+      for (const file of files) {
+        const resourceType = req.body.resourceType || (file.mimetype.startsWith('video/') ? 'video' : 'image');
+        const result = await uploadToCloudinary(file.buffer, resourceType);
+        const itemPayload = {
+          ...payload,
+          mediaUrl: result.secure_url,
+          public_id: result.public_id,
+          resourceType
+        };
+        const item = await heroService.create(itemPayload);
+        createdItems.push(item);
+      }
+      const responseData = createdItems.length === 1 ? createdItems[0] : createdItems;
+      res.status(201).json(new ApiResponse(201, responseData, 'Slider created successfully'));
     } else {
       throw new ApiError(400, 'Media file is required');
     }
-
-    const item = await heroService.create(payload);
-    res.status(201).json(new ApiResponse(201, item, 'Slider created successfully'));
   } catch (error) {
     next(error);
   }
@@ -48,11 +57,14 @@ const update = async (req, res, next) => {
     const current = await heroService.getById(req.params.id);
     if (!current) throw new ApiError(404, 'Slider not found');
 
-    if (req.file) {
-      const resourceType = req.body.resourceType || current.resourceType || 'image';
-      const result = await uploadToCloudinary(req.file.buffer, resourceType);
+    const files = req.files || (req.file ? [req.file] : []);
+    if (files.length > 0) {
+      const file = files[0];
+      const resourceType = req.body.resourceType || current.resourceType || (file.mimetype.startsWith('video/') ? 'video' : 'image');
+      const result = await uploadToCloudinary(file.buffer, resourceType);
       payload.mediaUrl = result.secure_url;
       payload.public_id = result.public_id;
+      payload.resourceType = resourceType;
     }
 
     const item = await heroService.update(req.params.id, payload);
@@ -73,20 +85,17 @@ const remove = async (req, res, next) => {
 };
 
 export {
-
   getAll,
   getById,
   create,
   update,
   remove
-
 };
-export default {
 
+export default {
   getAll,
   getById,
   create,
   update,
   remove
-
 };

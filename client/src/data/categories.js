@@ -6,6 +6,7 @@ export const categories = [
   { id: 'birthday', name: 'Birthdays' },
   { id: 'maternity', name: 'Maternity' },
   { id: 'baby-shoot', name: 'Baby Shoots' },
+  {id:'flim', name:'Film Shoots'},
  
 
 

@@ -1,7 +1,41 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
-import { X, MapPin, Calendar, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { X, MapPin, Calendar, ChevronLeft, ChevronRight, Eye, Play } from 'lucide-react';
+
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/')) {
+    return url;
+  }
+  const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const ytMatch = url.match(ytRegExp);
+  if (ytMatch && ytMatch[2].length === 11) {
+    return `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
+  }
+  const vimeoRegExp = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+  const vimeoMatch = url.match(vimeoRegExp);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+  }
+  return url;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const reg = /^\d{4}-\d{2}-\d{2}$/;
+  if (reg.test(dateStr)) {
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  }
+  return dateStr;
+};
 
 export default function Gallery({ selectedCategory, setSelectedCategory }) {
   const [categories, setCategories] = useState([]);
@@ -9,6 +43,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
   const [filteredItems, setFilteredItems] = useState([]);
   const [modalIndex, setModalIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [innerImageIndex, setInnerImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +79,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
   const openModal = (id) => {
     const idx = galleryItems.findIndex(item => item._id === id);
     setModalIndex(idx);
+    setInnerImageIndex(0);
   };
 
   const closeModal = () => {
@@ -54,6 +90,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
     e.stopPropagation();
     if (modalIndex !== null) {
       setModalIndex(prev => (prev === 0 ? galleryItems.length - 1 : prev - 1));
+      setInnerImageIndex(0);
     }
   };
 
@@ -61,6 +98,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
     e.stopPropagation();
     if (modalIndex !== null) {
       setModalIndex(prev => (prev === galleryItems.length - 1 ? 0 : prev + 1));
+      setInnerImageIndex(0);
     }
   };
 
@@ -145,6 +183,13 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                   className="w-full h-full object-cover gallery-img-zoom"
                 />
 
+                {/* Video Play Indicator Icon */}
+                {item.videoUrl && (
+                  <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-accent shadow-md backdrop-blur-xs group-hover:scale-110 transition-transform duration-300">
+                    <Play className="w-3.5 h-3.5 fill-accent" />
+                  </div>
+                )}
+
                 {/* Dark Overlay on Hover */}
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 z-10">
                   <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
@@ -160,7 +205,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                     </div>
                     <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/20">
                       <span className="text-[10px] text-white/50 tracking-wider flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {item.date}
+                        <Calendar className="w-3 h-3" /> {formatDate(item.date)}
                       </span>
                     </div>
                   </div>
@@ -206,16 +251,82 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
 
               {/* Main Content Area */}
               <div className="w-full flex-1 flex flex-col lg:flex-row items-center bg-[#111111]/80 border border-white/10 max-h-[80vh] overflow-y-auto lg:overflow-hidden rounded-xs">
-                {/* Image */}
+                {/* Image or Video Player */}
                 <div
-                  className="w-full lg:w-3/5 flex items-center justify-center bg-black overflow-hidden relative"
+                  className="w-full lg:w-3/5 aspect-video flex items-center justify-center bg-black overflow-hidden relative"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <img
-                    src={activeModalItem.imageUrl}
-                    alt={activeModalItem.title}
-                    className="max-w-full max-h-[70vh] object-contain hover:scale-102 transition-transform duration-700"
-                  />
+                  {activeModalItem.videoUrl ? (
+                    activeModalItem.videoUrl.includes('youtube.com') ||
+                    activeModalItem.videoUrl.includes('youtu.be') ||
+                    activeModalItem.videoUrl.includes('vimeo.com') ? (
+                      <iframe
+                        src={getEmbedUrl(activeModalItem.videoUrl)}
+                        title={activeModalItem.title}
+                        className="w-full h-full min-h-[40vh] lg:min-h-[60vh] border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        src={activeModalItem.videoUrl}
+                        controls
+                        autoPlay
+                        className="w-full h-full max-h-[70vh] object-contain"
+                      />
+                    )
+                  ) : (
+                    <>
+                      <img
+                        src={
+                          activeModalItem.images && activeModalItem.images.length > 0
+                            ? activeModalItem.images[innerImageIndex].secure_url
+                            : activeModalItem.imageUrl
+                        }
+                        alt={activeModalItem.title}
+                        className="max-w-full max-h-[70vh] object-contain hover:scale-102 transition-transform duration-700"
+                      />
+
+                      {/* Inner Images Sub-navigation Slider */}
+                      {activeModalItem.images && activeModalItem.images.length > 1 && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setInnerImageIndex(prev =>
+                                prev === 0 ? activeModalItem.images.length - 1 : prev - 1
+                              );
+                            }}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-accent hover:text-white transition-colors cursor-pointer border border-white/10 animate-fade-in"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setInnerImageIndex(prev =>
+                                prev === activeModalItem.images.length - 1 ? 0 : prev + 1
+                              );
+                            }}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-accent hover:text-white transition-colors cursor-pointer border border-white/10 animate-fade-in"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                          {/* Dots/Indicators */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/50 px-3 py-1 rounded-full border border-white/5">
+                            {activeModalItem.images.map((_, idx) => (
+                              <div
+                                key={idx}
+                                className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+                                  idx === innerImageIndex ? 'bg-accent' : 'bg-white/40'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
 
                   {/* Mobile Navigation Arrows */}
                   <div className="absolute inset-x-0 bottom-4 flex justify-between px-4 md:hidden">
@@ -258,7 +369,7 @@ export default function Gallery({ selectedCategory, setSelectedCategory }) {
                     </div>
                     <div className="flex items-center gap-2 text-white/80 text-xs">
                       <Calendar className="w-4 h-4 text-accent" />
-                      <span>{activeModalItem.date}</span>
+                      <span>{formatDate(activeModalItem.date)}</span>
                     </div>
                   </div>
                 </div>

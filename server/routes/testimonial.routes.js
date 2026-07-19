@@ -7,8 +7,8 @@ import upload from '../middleware/upload.js';
 router.get('/', testimonialController.getAll);
 router.get('/:id', testimonialController.getById);
 
-router.post('/', verifyJWT, verifyAdmin, upload.single('file'), testimonialController.create);
-router.put('/:id', verifyJWT, verifyAdmin, upload.single('file'), testimonialController.update);
+router.post('/', verifyJWT, verifyAdmin, upload.any(), testimonialController.create);
+router.put('/:id', verifyJWT, verifyAdmin, upload.any(), testimonialController.update);
 router.delete('/:id', verifyJWT, verifyAdmin, testimonialController.remove);
 
 export default router;
